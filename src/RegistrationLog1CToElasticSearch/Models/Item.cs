@@ -27,5 +27,31 @@ namespace RegistrationLog1CToElasticSearch.Models
         public long SessionDataSplitCode { get; set; }
         public DateTime TransactionDate { get; set; }
         public long TransactionStatus { get; set; }
+        public string Url { get; set; }
+
+        internal void SetUrl()
+        {
+            string newUrl = string.Empty;
+
+            if (!string.IsNullOrEmpty(Metadata)
+                && !string.IsNullOrEmpty(Data))
+            {
+                int positionColon = Data.IndexOf(':');
+
+                if (positionColon > 0)
+                {
+                    string dataStartsWith = Data[..positionColon];
+
+                    if (int.TryParse(dataStartsWith, out _))
+                    {
+                        string dataToUrl = Data[(positionColon + 1)..];
+
+                        newUrl = $"e1cib/data/{Metadata}?ref={dataToUrl}";
+                    }
+                };
+            };
+
+            Url = newUrl;
+        }
     }
 }
