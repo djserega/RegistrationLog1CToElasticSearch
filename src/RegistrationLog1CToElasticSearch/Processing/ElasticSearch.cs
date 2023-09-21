@@ -91,6 +91,7 @@ namespace RegistrationLog1CToElasticSearch.Processing
                 UserUuid = GetUuid(_dbContext.UserCodes, eventLog.UserCode),
                 WorkServerCode = eventLog.WorkServerCode
             };
+            logItem.SetUrl();
 
             return logItem;
         }
