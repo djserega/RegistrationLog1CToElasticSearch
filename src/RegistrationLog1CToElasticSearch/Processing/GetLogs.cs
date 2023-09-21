@@ -21,7 +21,7 @@
 
             List<Models.LogModels.EventLog> eventLogs = await _dbContext.GetEventLogListAsync(
                 el => el.Date > dateFrom && el.RowID > lastId,
-                default, //f => f.OrderBy(o => -o.RowID)
+                default,
                 _mainConfig.MainTakeElements);
 
             return eventLogs;
