@@ -1,9 +1,13 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace RegistrationLog1CToElasticSearch
 {
     public class MainConfig
     {
+        private const string _configFileName = "config.json";
+
         private readonly IConfigurationRoot _config;
         private readonly string _basePath;
 
@@ -21,13 +25,18 @@ namespace RegistrationLog1CToElasticSearch
 
             _config = new ConfigurationBuilder()
                     .SetBasePath(_basePath)
-                    .AddJsonFile("config.json", false, true)
+                    .AddJsonFile(_configFileName, false, true)
                     .Build();
         }
 
+        #region Propetries
+
         internal string BasePath { get => _basePath; }
 
-        
+        #endregion
+
+        #region Config data
+
         private readonly string _prefixMain = "main:";
         internal int MainTakeElements { get => _config.GetValue<int>(_prefixMain + "takeElements"); }
         internal int MainTimeoutSeconds { get => _config.GetValue<int>(_prefixMain + "timeoutSeconds"); }
@@ -44,5 +53,32 @@ namespace RegistrationLog1CToElasticSearch
         private readonly string _prefixSQLite = "sqlite:";
         internal string SQLiteLogPath { get => _config.GetValue<string>(_prefixSQLite + "logpath") ; }
         internal DateTime SQLiteDateFrom { get => _config.GetValue<DateTime>(_prefixSQLite + "dateFrom"); }
+        internal long SQLiteRowIdFrom { get => _config.GetValue<long>(_prefixSQLite + "rowIdFrom"); }
+
+        #endregion
+    
+        internal void UpdateFilterData(DateTime dateTime, long rowId)
+        {
+            // update
+            Models.MainConfig config = GetMainConfig();
+            config.SQLite.DateFrom = dateTime;
+            config.SQLite.RowIdFrom = rowId;
+
+            // converted
+            JsonSerializerOptions jsonWriteOptions = new()
+            {
+                WriteIndented = true
+            };
+            jsonWriteOptions.Converters.Add(new JsonStringEnumConverter());
+
+            // update file
+            File.WriteAllText(
+                Path.Combine(_basePath, _configFileName),
+                JsonSerializer.Serialize(config, jsonWriteOptions));
+        }
+
+        private Models.MainConfig GetMainConfig()
+            => _config.Get<Models.MainConfig>()!;
+
     }
 }

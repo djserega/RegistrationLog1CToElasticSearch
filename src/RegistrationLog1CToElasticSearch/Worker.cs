@@ -19,6 +19,7 @@ namespace RegistrationLog1CToElasticSearch
             _dbContext = dbContext;
 
             _dateFrom = mainConfig.SQLiteDateFrom.DateToSQLite();
+            _lastId = mainConfig.SQLiteRowIdFrom;
         }
 
         private async Task GetSendLogs()
@@ -46,6 +47,8 @@ namespace RegistrationLog1CToElasticSearch
             {
                 _logger.LogError("Error num: " + ex.ToString());
             }
+
+            _mainConfig.UpdateFilterData(_dateFrom.DateFromSQLite(), _lastId);
 
             _logger.LogInformation($"Updating filter. Date {_dateFrom.DateFromSQLite()} & row ID {_lastId} --");
         }
