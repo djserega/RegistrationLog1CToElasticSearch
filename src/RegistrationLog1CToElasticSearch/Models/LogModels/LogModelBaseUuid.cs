@@ -2,6 +2,6 @@
 {
     public class LogModelBaseUuid : LogModelBase
     {
-        public string Uuid { get; set; }
+        public required string Uuid { get; set; }
     }
 }

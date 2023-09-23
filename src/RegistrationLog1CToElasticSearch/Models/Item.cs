@@ -5,20 +5,24 @@ namespace RegistrationLog1CToElasticSearch.Models
 {
     internal class Item
     {
+
+        [JsonIgnore()]
+        internal required string Index { get; set; }
+
         [JsonPropertyName("timestamp")]
         public DateTime Date { get; set; }
-        public string User { get; set; }
-        public string UserUuid { get; set; }
-        public string Computer { get; set; }
-        public string Event { get; set; }
-        public string Comment { get; set; }
-        public string DataPresentation { get; set; }
-        public string Data { get; set; }
-        public string Metadata { get; set; }
-        public string MetadataUuid { get; set; }
+        public required string User { get; set; }
+        public required string UserUuid { get; set; }
+        public required string Computer { get; set; }
+        public required string Event { get; set; }
+        public required string Comment { get; set; }
+        public required string DataPresentation { get; set; }
+        public required string Data { get; set; }
+        public required string Metadata { get; set; }
+        public required string MetadataUuid { get; set; }
         public long DataType { get; set; }
-        public string App { get; set; }
-        public string PrimaryPortCode { get; set; }
+        public required string App { get; set; }
+        public required string PrimaryPortCode { get; set; }
         public long SecondaryPortCode { get; set; }
         public long WorkServerCode { get; set; }
         public long TransactionID { get; set; }
@@ -27,7 +31,8 @@ namespace RegistrationLog1CToElasticSearch.Models
         public long SessionDataSplitCode { get; set; }
         public DateTime TransactionDate { get; set; }
         public long TransactionStatus { get; set; }
-        public string Url { get; set; }
+        public string? Url { get; set; }
+
 
         internal void SetUrl()
         {

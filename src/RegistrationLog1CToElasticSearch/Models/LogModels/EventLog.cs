@@ -19,14 +19,15 @@ namespace RegistrationLog1CToElasticSearch.Models.LogModels
         public long ComputerCode { get; set; }
         public long AppCode { get; set; }
         public long EventCode { get; set; }
-        public string Comment { get; set; }
-        public string MetadataCodes { get; set; }
+        public required string Comment { get; set; }
+        public required string MetadataCodes { get; set; }
         public long SessionDataSplitCode { get; set; }
         public long DataType { get; set; }
-        public string Data { get; set; }
-        public string DataPresentation { get; set; }
+        public required string Data { get; set; }
+        public required string DataPresentation { get; set; }
         public long WorkServerCode { get; set; }
         public long PrimaryPortCode { get; set; }
         public long SecondaryPortCode { get; set; }
+
     }
 }
