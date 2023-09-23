@@ -40,18 +40,20 @@ namespace RegistrationLog1CToElasticSearch
         private readonly string _prefixMain = "main:";
         internal int MainTakeElements { get => _config.GetValue<int>(_prefixMain + "takeElements"); }
         internal int MainTimeoutSeconds { get => _config.GetValue<int>(_prefixMain + "timeoutSeconds"); }
+        internal bool MainEnableBatchUnload { get => _config.GetValue<bool>(_prefixMain + "enableBatchUnload"); }
+        internal int MainPacketSendCount { get => _config.GetValue<int>(_prefixMain + "packetSendCount"); }
 
 
         private readonly string _prefixElasticsearch = "elasticsearch:";
-        internal string ElasticIndexName { get => _config.GetValue<string>(_prefixElasticsearch + "indexName"); }
-        internal string ElasticIndexFormat { get => _config.GetValue<string>(_prefixElasticsearch + "indexFormat"); }
-        internal string Uri { get => _config.GetValue<string>(_prefixElasticsearch + "uri"); }
-        internal string ElasticLogin { get => _config.GetValue<string>(_prefixElasticsearch + "login") ; }
-        internal string ElasticPassword { get => _config.GetValue<string>(_prefixElasticsearch + "password") ; }
+        internal string ElasticIndexName { get => _config.GetValue<string>(_prefixElasticsearch + "indexName")!; }
+        internal string ElasticIndexFormat { get => _config.GetValue<string>(_prefixElasticsearch + "indexFormat")!; }
+        internal string Uri { get => _config.GetValue<string>(_prefixElasticsearch + "uri")!; }
+        internal string ElasticLogin { get => _config.GetValue<string>(_prefixElasticsearch + "login")! ; }
+        internal string ElasticPassword { get => _config.GetValue<string>(_prefixElasticsearch + "password")! ; }
 
 
         private readonly string _prefixSQLite = "sqlite:";
-        internal string SQLiteLogPath { get => _config.GetValue<string>(_prefixSQLite + "logpath") ; }
+        internal string SQLiteLogPath { get => _config.GetValue<string>(_prefixSQLite + "logpath")! ; }
         internal DateTime SQLiteDateFrom { get => _config.GetValue<DateTime>(_prefixSQLite + "dateFrom"); }
         internal long SQLiteRowIdFrom { get => _config.GetValue<long>(_prefixSQLite + "rowIdFrom"); }
 
@@ -61,6 +63,10 @@ namespace RegistrationLog1CToElasticSearch
         {
             // update
             Models.MainConfig config = GetMainConfig();
+
+            if (config.SQLite.DateFrom == dateTime && config.SQLite.RowIdFrom == rowId)
+                return;
+
             config.SQLite.DateFrom = dateTime;
             config.SQLite.RowIdFrom = rowId;
 
