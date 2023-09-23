@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
     <UserSecretsId>dotnet-RegistrationLog1CToElasticSearch-83017e5e-4083-4e4f-97b8-65b0573ba70b</UserSecretsId>
+    <AssemblyVersion>1.2</AssemblyVersion>
+    <FileVersion>1.2</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
