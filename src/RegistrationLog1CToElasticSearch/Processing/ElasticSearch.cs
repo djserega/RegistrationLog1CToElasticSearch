@@ -1,6 +1,5 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
-using Microsoft.EntityFrameworkCore;
 
 namespace RegistrationLog1CToElasticSearch.Processing
 {
@@ -10,16 +9,11 @@ namespace RegistrationLog1CToElasticSearch.Processing
         private readonly MainConfig _mainConfig;
         private readonly ElasticsearchClient _client;
 
-        private readonly EF.ReaderContext _dbContext;
-
-
         public ElasticSearch(ILogger<Worker> logger,
-                             MainConfig mainConfig,
-                             EF.ReaderContext dbContext)
+                             MainConfig mainConfig)
         {
             _logger = logger;
             _mainConfig = mainConfig;
-            _dbContext = dbContext;
 
             ElasticsearchClientSettings settings = new ElasticsearchClientSettings(new Uri(_mainConfig.Uri))
                 .Authentication(new BasicAuthentication(_mainConfig.ElasticLogin, _mainConfig.ElasticPassword))
@@ -31,21 +25,14 @@ namespace RegistrationLog1CToElasticSearch.Processing
 
         }
 
-        internal async Task SendItemLog(Models.LogModels.EventLog eventLog)
+        internal async Task SendLogAsync(Models.Item logItem, string index)
         {
-            DateTime logItemDate = eventLog.Date.DateFromSQLite();
-
-            Models.Item logItem = ConvertEventLog(eventLog, logItemDate);
-
-            string currentIndex = _mainConfig.ElasticIndexName + logItemDate.ToString(_mainConfig.ElasticIndexFormat);
-
 #if DEBUG
-            _logger.LogDebug(currentIndex);
-            _logger.LogDebug(System.Text.Json.JsonSerializer.Serialize(logItem));
+            _logger.LogDebug($"{index} {System.Text.Json.JsonSerializer.Serialize(logItem)}");
 #else
             try
             {
-                IndexResponse response = await _client.IndexAsync(logItem, currentIndex);
+                IndexResponse response = await _client.IndexAsync(logItem, index);
 
                 if (response.IsValidResponse)
                 {
@@ -63,56 +50,29 @@ namespace RegistrationLog1CToElasticSearch.Processing
 #endif
         }
 
-        private Models.Item ConvertEventLog(Models.LogModels.EventLog eventLog, DateTime logItemDate)
+        internal async Task SendLogsAsync(IEnumerable<Models.Item> logItems, string index, int numRunTask)
         {
-            _ = long.TryParse(eventLog.MetadataCodes, out long metadata);
-
-            Models.Item logItem = new()
+#if DEBUG
+            _logger.LogDebug($"{numRunTask} {index} {System.Text.Json.JsonSerializer.Serialize(logItems.First())}");
+#else
+            try
             {
-                Date = logItemDate,
-                App = GetName(_dbContext.AppCodes, eventLog.AppCode),
-                Comment = eventLog.Comment,
-                Computer = GetName(_dbContext.ComputerCodes, eventLog.ComputerCode),
-                ConnectID = eventLog.ConnectID,
-                Data = eventLog.Data,
-                DataPresentation = eventLog.DataPresentation,
-                DataType = eventLog.DataType,
-                Event = ConvertEventName(GetName(_dbContext.EventCodes, eventLog.EventCode)),
-                Metadata = GetName(_dbContext.MetadataCodes, metadata),
-                MetadataUuid = GetUuid(_dbContext.MetadataCodes, metadata),
-                PrimaryPortCode = GetName(_dbContext.PrimaryPortCodes, eventLog.PrimaryPortCode),
-                SecondaryPortCode = eventLog.SecondaryPortCode,
-                Session = eventLog.Session,
-                SessionDataSplitCode = eventLog.SessionDataSplitCode,
-                TransactionDate = eventLog.TransactionDate.DateFromSQLite(),
-                TransactionID = eventLog.TransactionID,
-                TransactionStatus = eventLog.TransactionStatus,
-                User = GetName(_dbContext.UserCodes, eventLog.UserCode),
-                UserUuid = GetUuid(_dbContext.UserCodes, eventLog.UserCode),
-                WorkServerCode = eventLog.WorkServerCode
-            };
-            logItem.SetUrl();
+                BulkResponse response = await _client.IndexManyAsync(logItems, index);
 
-            return logItem;
+                if (response.IsValidResponse)
+                {
+                    _logger.LogInformation($"Task: {numRunTask}. Documents added - {response.Items.Count}. With errors - {response.ItemsWithErrors.Count()}");
+                }
+                else
+                {
+                    _logger.LogError($"Task: {numRunTask}. An error occurred while adding the documents.\n{response.DebugInformation}");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.ToString());
+            }
+#endif
         }
-
-        private string GetName<TEntity>(DbSet<TEntity> table, long code) where TEntity : Models.LogModels.LogModelBase
-        {
-            _logger.LogDebug($"GetName - {table.GetType()} - {code}");
-
-            return table.FirstOrDefault(el => el.Code == code)?.Name ?? string.Empty;
-        }
-        private string GetUuid<TEntity>(DbSet<TEntity> table, long code) where TEntity : Models.LogModels.LogModelBaseUuid
-        {
-            _logger.LogDebug($"GetUuid - {table.GetType()} - {code}");
-       
-            return table.FirstOrDefault(el => el.Code == code)?.Uuid ?? string.Empty;
-        }
-
-        private static string ConvertEventName(string eventName)
-        {
-            return eventName.Replace("_$", "").Replace("$_", "");
-        }
-
     }
 }
