@@ -5,18 +5,15 @@ namespace RegistrationLog1CToElasticSearch
     {
         private readonly ILogger<Worker> _logger;
         private readonly MainConfig _mainConfig;
-        private readonly EF.ReaderContext _dbContext;
 
         internal long _dateFrom;
         internal long _lastId;
 
         public Worker(ILogger<Worker> logger,
-                      MainConfig mainConfig,
-                      EF.ReaderContext dbContext)
+                      MainConfig mainConfig)
         {
             _logger = logger;
             _mainConfig = mainConfig;
-            _dbContext = dbContext;
 
             _dateFrom = mainConfig.SQLiteDateFrom.DateToSQLite();
             _lastId = mainConfig.SQLiteRowIdFrom;
@@ -34,11 +31,13 @@ namespace RegistrationLog1CToElasticSearch
 
         private async Task GetSendLogs()
         {
+            EF.ReaderContext dbContext = new(_mainConfig);
+
             try
             {
-                Processing.GetLogs getLogs = new(_logger, _mainConfig, _dbContext);
+                Processing.GetLogs getLogs = new(_logger, _mainConfig, dbContext);
 
-                ConverterLogs converter = new(_logger, _mainConfig, _dbContext);
+                ConverterLogs converter = new(_logger, _mainConfig, dbContext);
 
                 if (_mainConfig.MainEnableBatchUnload)
                 {

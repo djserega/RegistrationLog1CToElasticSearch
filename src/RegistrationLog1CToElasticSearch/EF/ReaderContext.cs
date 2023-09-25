@@ -12,13 +12,13 @@ namespace RegistrationLog1CToElasticSearch.EF
             _mainConfig = mainConfig;
         }
 
-        public required DbSet<Models.LogModels.AppCodes> AppCodes { get; set; }
-        public required DbSet<Models.LogModels.ComputerCodes> ComputerCodes { get; set; }
-        public required DbSet<Models.LogModels.EventCodes> EventCodes { get; set; }
-        public required DbSet<Models.LogModels.UserCodes> UserCodes { get; set; }
-        public required DbSet<Models.LogModels.MetadataCodes> MetadataCodes { get; set; }
-        public required DbSet<Models.LogModels.PrimaryPortCodes> PrimaryPortCodes { get; set; }
-        public required DbSet<Models.LogModels.EventLog> EventLog { get; set; }
+        public DbSet<Models.LogModels.AppCodes> AppCodes { get; set; }
+        public DbSet<Models.LogModels.ComputerCodes> ComputerCodes { get; set; }
+        public DbSet<Models.LogModels.EventCodes> EventCodes { get; set; }
+        public DbSet<Models.LogModels.UserCodes> UserCodes { get; set; }
+        public DbSet<Models.LogModels.MetadataCodes> MetadataCodes { get; set; }
+        public DbSet<Models.LogModels.PrimaryPortCodes> PrimaryPortCodes { get; set; }
+        public DbSet<Models.LogModels.EventLog> EventLog { get; set; }
 
         public async Task<List<Models.LogModels.EventLog>> GetEventLogsAsync(
                 Expression<Func<Models.LogModels.EventLog, bool>>? predicate = default,

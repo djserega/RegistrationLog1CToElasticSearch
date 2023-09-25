@@ -6,7 +6,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         services.AddSingleton<MainConfig>();
 
-        services.AddSingleton<ReaderContext>();
+        services.AddTransient<ReaderContext>();
 
         services.AddHostedService<Worker>();
     })
