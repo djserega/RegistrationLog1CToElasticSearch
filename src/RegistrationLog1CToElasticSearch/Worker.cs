@@ -1,22 +1,25 @@
 
+
 namespace RegistrationLog1CToElasticSearch
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly FileLogger _logger;
         private readonly MainConfig _mainConfig;
 
         internal long _dateFrom;
         internal long _lastId;
 
-        public Worker(ILogger<Worker> logger,
-                      MainConfig mainConfig)
+        public Worker(MainConfig mainConfig,
+                      FileLogger logger)
         {
-            _logger = logger;
             _mainConfig = mainConfig;
+            _logger = logger;
 
             _dateFrom = mainConfig.SQLiteDateFrom.DateToSQLite();
             _lastId = mainConfig.SQLiteRowIdFrom;
+
+            _logger.LogInf($"Read filters: Date -> {_dateFrom.DateFromSQLite()}, Id -> {_lastId}");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -51,10 +54,10 @@ namespace RegistrationLog1CToElasticSearch
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error num: " + ex.ToString());
+                _logger.LogErr("Error num: " + ex.ToString());
             }
 
-            _logger.LogInformation($"Updating filter. Date {_dateFrom.DateFromSQLite()} & row ID {_lastId} --");
+            _logger.LogInf($"Updating filter. Date {_dateFrom.DateFromSQLite()} & row ID {_lastId} --");
         }
 
         private async Task UnloadDataWithOneRow(Processing.GetLogs getLogs, ConverterLogs converter)

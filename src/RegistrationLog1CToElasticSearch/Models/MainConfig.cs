@@ -5,46 +5,77 @@ namespace RegistrationLog1CToElasticSearch.Models
     public class MainConfig
     {
         [JsonPropertyName("main")]
-        public required Main Main { get; set; }
+        public Main Main { get; set; } = new();
+
         [JsonPropertyName("elasticsearch")]
-        public required Elasticsearch Elasticsearch { get; set; }
+        public Elasticsearch Elasticsearch { get; set; } = new();
+        
         [JsonPropertyName("sqlite")]
-        public required SQLite SQLite { get; set; }
+        public SQLite SQLite { get; set; } = new();
+       
+        [JsonPropertyName("logging")]
+        public Logging Logging { get; set; } = new();
     }
 
     public class Main
     {
         [JsonPropertyName("takeElements")]
-        public required int TakeElements { get; set; }
+        public int TakeElements { get; set; } = 1000;
+        
         [JsonPropertyName("timeoutSeconds")]
-        public required int TimeoutSeconds { get; set; }
+        public int TimeoutSeconds { get; set; } = 5;
+        
         [JsonPropertyName("enableBatchUnload")]
-        public required bool EnableBatchUnload { get; set; }
-	    [JsonPropertyName("packetSendCount")]
-        public required int PacketSendCount { get; set; }
+        public bool EnableBatchUnload { get; set; } = true;
+        
+        [JsonPropertyName("packetSendCount")]
+        public int PacketSendCount { get; set; } = 6;
     }
 
     public class Elasticsearch
     {
         [JsonPropertyName("indexName")]
-        public required string IndexName { get; set; }
+        public string IndexName { get; set; } = "log1c-";
+
         [JsonPropertyName("indexFormat")]
-        public required string IndexFormat { get; set; }
+        public string IndexFormat { get; set; } = "yyyyMM";
+
         [JsonPropertyName("uri")]
-        public required string Uri { get; set; }
+        public string Uri { get; set; } = "https://ip:9200";
+
         [JsonPropertyName("login")]
-        public required string Login { get; set; }
+        public string Login { get; set; } = "login";
+        
         [JsonPropertyName("password")]
-        public required string Password { get; set; }
+        public string Password { get; set; } = "password";
     }
 
     public class SQLite
     {
         [JsonPropertyName("logpath")]
-        public required string LogPath { get; set; }
+        public string LogPath { get; set; } = "";
+       
         [JsonPropertyName("dateFrom")]
-        public required DateTime DateFrom { get; set; }
+        public DateTime DateFrom { get; set; } = DateTime.MinValue;
+        
         [JsonPropertyName("rowIdFrom")]
-        public required long RowIdFrom { get; set; }
+        public long RowIdFrom { get; set; } = 0;
+    }
+
+    public class Logging
+    {
+        [JsonPropertyName("__interval")]
+        public string IntervalComment { get; set; } = "Infinite - 0, Year - 1, Month - 2, Day - 3, Hour - 4, Minute - 5";
+        
+        [JsonPropertyName("interval")]
+        public int Interval { get; set; } = 3;
+        [JsonPropertyName("prefix")]
+        public string Prefix { get; set; } = "log-";
+        
+        [JsonPropertyName("format")] 
+        public string Format { get; set; } = "yyyy-MM-dd HH:mm:ss.fff zzz";
+        
+        [JsonPropertyName("countFiles")]
+        public int CountFiles { get; set; } = 10;
     }
 }

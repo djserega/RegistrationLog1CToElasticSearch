@@ -2,11 +2,11 @@
 {
     internal class GetLogs
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly FileLogger _logger;
         private readonly MainConfig _mainConfig;
         private readonly EF.ReaderContext _dbContext;
 
-        public GetLogs(ILogger<Worker> logger,
+        public GetLogs(FileLogger logger,
                        MainConfig mainConfig,
                        EF.ReaderContext dbContext)
         {
@@ -17,7 +17,7 @@
 
         internal async Task<List<Models.LogModels.EventLog>> GetEventLogsAsync(long dateFrom, long lastId, int numRunTask = 0)
         {
-            _logger.LogInformation($"Task: {numRunTask}. Selecting. Date {dateFrom.DateFromSQLite()} & row ID {lastId} --");
+            _logger.LogInf($"Task: {numRunTask}. Selecting. Date {dateFrom.DateFromSQLite()} & row ID {lastId} --");
 
             List<Models.LogModels.EventLog> eventLogs = await _dbContext.GetEventLogsAsync(
                 el => el.Date > dateFrom && el.RowID > lastId,

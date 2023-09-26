@@ -23,10 +23,22 @@ namespace RegistrationLog1CToElasticSearch
             if (string.IsNullOrEmpty(_basePath))
                 throw new DirectoryNotFoundException("basePath");
 
-            _config = new ConfigurationBuilder()
+            try
+            {
+                _config = new ConfigurationBuilder()
                     .SetBasePath(_basePath)
                     .AddJsonFile(_configFileName, false, true)
                     .Build();
+            }
+            catch (Exception ex)
+            {
+                SaveConfig(new Models.MainConfig());
+
+                _config = new ConfigurationBuilder()
+                    .SetBasePath(_basePath)
+                    .AddJsonFile(_configFileName, false, true)
+                    .Build();
+            }
         }
 
         #region Propetries
@@ -48,17 +60,25 @@ namespace RegistrationLog1CToElasticSearch
         internal string ElasticIndexName { get => _config.GetValue<string>(_prefixElasticsearch + "indexName")!; }
         internal string ElasticIndexFormat { get => _config.GetValue<string>(_prefixElasticsearch + "indexFormat")!; }
         internal string Uri { get => _config.GetValue<string>(_prefixElasticsearch + "uri")!; }
-        internal string ElasticLogin { get => _config.GetValue<string>(_prefixElasticsearch + "login")! ; }
-        internal string ElasticPassword { get => _config.GetValue<string>(_prefixElasticsearch + "password")! ; }
+        internal string ElasticLogin { get => _config.GetValue<string>(_prefixElasticsearch + "login")!; }
+        internal string ElasticPassword { get => _config.GetValue<string>(_prefixElasticsearch + "password")!; }
 
 
         private readonly string _prefixSQLite = "sqlite:";
-        internal string SQLiteLogPath { get => _config.GetValue<string>(_prefixSQLite + "logpath")! ; }
+        internal string SQLiteLogPath { get => _config.GetValue<string>(_prefixSQLite + "logpath")!; }
         internal DateTime SQLiteDateFrom { get => _config.GetValue<DateTime>(_prefixSQLite + "dateFrom"); }
         internal long SQLiteRowIdFrom { get => _config.GetValue<long>(_prefixSQLite + "rowIdFrom"); }
 
+
+        private readonly string _prefixLogging = "logging:";
+        internal string LoggingIntervalComment { get => _config.GetValue<string>(_prefixLogging + "__interval")!; } 
+        internal int LoggingInterval { get => _config.GetValue<int>(_prefixLogging + "interval"); }
+        internal string LoggingPrefix { get => _config.GetValue<string>(_prefixLogging + "prefix")!; }
+        internal string LoggingFormat { get => _config.GetValue<string>(_prefixLogging + "format")!; }
+        internal int LoggingCountFiles { get => _config.GetValue<int>(_prefixLogging + "countFiles"); }
+
         #endregion
-    
+
         internal void UpdateFilterData(DateTime dateTime, long rowId)
         {
             // update
@@ -70,6 +90,11 @@ namespace RegistrationLog1CToElasticSearch
             config.SQLite.DateFrom = dateTime;
             config.SQLite.RowIdFrom = rowId;
 
+            SaveConfig(config);
+        }
+
+        private void SaveConfig(Models.MainConfig config)
+        {
             // converted
             JsonSerializerOptions jsonWriteOptions = new()
             {

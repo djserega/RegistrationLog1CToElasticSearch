@@ -5,11 +5,11 @@ namespace RegistrationLog1CToElasticSearch.Processing
 {
     public class ElasticSearch
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly FileLogger _logger;
         private readonly MainConfig _mainConfig;
         private readonly ElasticsearchClient _client;
 
-        public ElasticSearch(ILogger<Worker> logger,
+        public ElasticSearch(FileLogger logger,
                              MainConfig mainConfig)
         {
             _logger = logger;
@@ -36,11 +36,11 @@ namespace RegistrationLog1CToElasticSearch.Processing
 
                 if (response.IsValidResponse)
                 {
-                    _logger.LogInformation($"Index document with ID {response.Id} succeeded.");
+                    _logger.LogInf($"Index document with ID {response.Id} succeeded.");
                 }
                 else
                 {
-                    _logger.LogError($"An error occurred while adding the document.\n{response.DebugInformation}");
+                    _logger.LogErr($"An error occurred while adding the document.\n{response.DebugInformation}");
                 }
             }
             catch (Exception ex)
@@ -61,11 +61,11 @@ namespace RegistrationLog1CToElasticSearch.Processing
 
                 if (response.IsValidResponse)
                 {
-                    _logger.LogInformation($"Task: {numRunTask}. Documents added - {response.Items.Count}. With errors - {response.ItemsWithErrors.Count()}");
+                    _logger.LogInf($"Task: {numRunTask}. Documents added - {response.Items.Count}. With errors - {response.ItemsWithErrors.Count()}");
                 }
                 else
                 {
-                    _logger.LogError($"Task: {numRunTask}. An error occurred while adding the documents.\n{response.DebugInformation}");
+                    _logger.LogErr($"Task: {numRunTask}. An error occurred while adding the documents.\n{response.DebugInformation}");
                 }
             }
             catch (Exception ex)

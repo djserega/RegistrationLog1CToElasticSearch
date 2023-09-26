@@ -4,11 +4,11 @@ namespace RegistrationLog1CToElasticSearch
 {
     internal class ConverterLogs
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly FileLogger _logger;
         private readonly MainConfig _mainConfig;
         private readonly EF.ReaderContext _dbContext;
 
-        public ConverterLogs(ILogger<Worker> logger,
+        public ConverterLogs(FileLogger logger,
                              MainConfig mainConfig,
                              EF.ReaderContext dbContext)
         {
